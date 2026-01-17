@@ -1,0 +1,18 @@
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, Response
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+
+app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+templates = Jinja2Templates(directory="app/templates")
+
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/info", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("info.html", {"request": request})
