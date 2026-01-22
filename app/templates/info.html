@@ -12,9 +12,13 @@
     <p>Существует два вида: валлийский пемброк и валлийский кардиган. Они прекрасно ладят с детьми и другими
         животными.</p>
     <div class="gallery">
-        <img src="/static/images/corgi1.jpg" alt="Корги 1">
-        <img src="/static/images/corgi2.jpg" alt="Корги 2">
-    </div>
+    {% for photo in photos %}
+        <div class="photo">
+            <img src="/static/images/{{ photo.filename }}" alt="Корги">
+            <p>{{ photo.description }}</p>
+        </div>
+    {% endfor %}
+</div>
     <a href="/">
         <button>Вернуться</button>
     </a>
