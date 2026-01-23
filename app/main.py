@@ -1,3 +1,6 @@
+import os
+import time
+from pathlib import Path
 from fastapi import FastAPI, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -5,7 +8,6 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from sqlalchemy.exc import OperationalError
-import time, os
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@db:5432/corgi_db")
 engine = create_engine(DATABASE_URL)
@@ -39,11 +41,14 @@ def init_db():
         except OperationalError:
             time.sleep(2)
 
-init_db()
+if os.getenv("ENV") != "test":
+    init_db()
+
+BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 def get_db():
     db = SessionLocal()
@@ -54,9 +59,11 @@ def get_db():
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html")
+
 
 @app.get("/info", response_class=HTMLResponse)
 def info(request: Request, db: Session = Depends(get_db)):
     photos = db.query(Photo).all()
-    return templates.TemplateResponse("info.html", {"request": request, "photos": photos})
+    return templates.TemplateResponse(request, "info.html", {"photos": photos})
+
