@@ -27,6 +27,9 @@ jobs:
           pip install -r app/requirements.txt
           pip install pytest pytest-cov
 
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
+
       - name: Run tests
         run: pytest --cov=app
 
