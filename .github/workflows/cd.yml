@@ -22,3 +22,6 @@ jobs:
             git pull origin main
             docker compose down
             docker compose up -d --build
+
+            docker ps
+            curl -f http://localhost/ || exit 1
